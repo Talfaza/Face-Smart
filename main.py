@@ -19,6 +19,7 @@ for name in modelsPath:
 #print(len(imgModelsList))
 while True:
     success, img = cap.read()
-    imgBack[162:162+480,55:55+640] = img # filling webcam in backgound imgBack[startWidth:endWidth, heigh,heigh]
+    imgBack[162:162+480,55:55+640] = img # filling webcam in backgound position imgBack[startWidth:endWidth, heigh,heigh]
+    imgBack[44:44+633,808:808+414] = imgModelsList[0]
     cv2.imshow("Face Smart",imgBack)
     cv2.waitKey(1)
