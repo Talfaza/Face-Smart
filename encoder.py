@@ -29,7 +29,7 @@ def encodingGen(imgModelsList):
         encoding = face_recognition.face_encodings(img)[0]
         encodingList.append(encoding)
     return encodingList
-#("Strating to encode")
+("Strating to encode")
 encodingListKnown = encodingGen(imgModelsList)
 encodingListKnownId = [encodingListKnown, workerId]
 
@@ -39,5 +39,5 @@ file.close()
 print("Pickle File Dumpeb")
 
 
-#print("Finish")
-#print(encodingListKnown)
+print("Finish")
+print(encodingListKnown)
