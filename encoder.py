@@ -3,6 +3,17 @@ import face_recognition
 import pickle
 import os
 from PIL import Image
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+from firebase_admin import storage
+
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred, {
+    'databaseURL':"https://facesmart1-default-rtdb.europe-west1.firebasedatabase.app/",
+    'storgaeBucket':"facesmart1.appspot.com"
+
+})
 
 # Function to resize images to 250x250
 def resize_image(image):
@@ -31,7 +42,10 @@ for id in modelsPath:
     imgModelsList.append(model_img)
     #print(os.path.splitext(id)[0])
     workerId.append(os.path.splitext(id)[0])
+
+
 print(len(imgModelsList))
+
 
 #print(workerId)
 
