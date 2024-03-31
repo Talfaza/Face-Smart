@@ -22,7 +22,7 @@ for name in modelsPath:
     imgModelsList.append(model_img)
 #import pickle encoded file
 
-file = open('Face-Smart/encodeFile.p', 'rb')
+file = open('./encodeFile.p', 'rb')
 encodingListKnownId = pickle.load(file)
 file.close()
 encodingListKnown, workerId = encodingListKnownId
@@ -51,8 +51,8 @@ while True:
         matching = face_recognition.compare_faces(encodingListKnown,encodedFace)
         distanceFace = face_recognition.face_distance(encodingListKnown,encodedFace)
 
-        #print("matching", matching)
-        #print("distance", distanceFace) #the lower the better
+        print("matching", matching)
+        print("distance", distanceFace) #the lower the better
 
         """
         get a matching index then compare it the value in the matching if the value
