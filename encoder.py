@@ -11,7 +11,7 @@ from firebase_admin import storage
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred, {
     'databaseURL':"https://facesmart1-default-rtdb.europe-west1.firebasedatabase.app/",
-    'storgaeBucket':"facesmart1.appspot.com"
+    'storageBucket':"facesmart1.appspot.com"
 
 })
 
@@ -36,6 +36,8 @@ for id in modelsPath:
 
 imgModelsList = []
 workerId = []
+bucket = storage.bucket()
+firebase_folder = 'img'
 for id in modelsPath:
     model_path = os.path.join(path, id)
     model_img = cv2.imread(model_path)
@@ -43,6 +45,10 @@ for id in modelsPath:
     #print(os.path.splitext(id)[0])
     workerId.append(os.path.splitext(id)[0])
 
+    fileName = os.path.join(path, id)
+    with open(fileName, 'rb') as file:
+        blob = bucket.blob(firebase_folder + '/' + id) 
+        blob.upload_from_file(file)
 
 print(len(imgModelsList))
 
