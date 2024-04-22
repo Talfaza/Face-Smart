@@ -53,7 +53,7 @@ for id in modelsPath:
 print(len(imgModelsList))
 
 
-#print(workerId)
+print(workerId)
 
 
 def encodingGen(imgModelsList):

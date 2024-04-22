@@ -17,6 +17,6 @@ you can use the dlib wheel
 
 you also need to install additional packages 
 
-`pip install cmake face-recognition`
+`pip install cmake face-recognition pycrypto`
 
 TODO : continue later

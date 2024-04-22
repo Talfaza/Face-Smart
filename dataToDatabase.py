@@ -15,7 +15,7 @@ data = {
         'name':"Barake Obama",
         'Job':"President",
         'Tache':"Coding",
-        'total_attendence': 10,
+        'total_attendence': 12,
         'lastAttendenceDate':"2024-03-31 00:45:15"
     },
     '8685': {
