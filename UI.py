@@ -6,7 +6,6 @@ is_login_visible = False
 # Function to toggle login section visibility
 def toggle_login():
     global is_login_visible
-    # ... your existing toggle_login function implementation (from previous code)
 
 # Function to start facial recognition when the button is clicked
 def start_face_recognition():
@@ -19,7 +18,7 @@ app.state('zoomed')
 app.geometry("800x600")
 app.title("Face Smart")
 
-# **Create a frame to group the login section (optional for better organization):**
+# Create a frame to group the login section (optional for better organization):
 login_frame = ct.CTkFrame(master=app)
 login_frame.pack(pady=20)  # Add padding for spacing
 
