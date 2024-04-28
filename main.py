@@ -135,6 +135,8 @@ def run_facial_recognition():
         # Exit on 'q' key press
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+        elif cv2.getWindowProperty("Face Smart", cv2.WND_PROP_VISIBLE) < 1: # quit window 
+            break
 
     cap.release()
     cv2.destroyAllWindows()
