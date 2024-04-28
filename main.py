@@ -7,6 +7,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import storage
+import time
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred, {
@@ -54,6 +55,8 @@ def run_facial_recognition():
     counter = 0
     matchingIndex = None  # Define matchingIndex before the loop
     workersImg = np.zeros((256, 256, 3), dtype=np.uint8)  # Placeholder black image
+    start_time = time.time()  # Initialize start time
+    update_time = start_time  # Initialize update time
 
     while True:
         success, img = cap.read()
@@ -85,10 +88,18 @@ def run_facial_recognition():
                 imgBack = cv2.rectangle(imgBack, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]),
                                         (0, 255, 0), 2)  # Draw green bounding box
 
+                modeType = 2  # Set modeType to 2 when face is recognized
+
+        if modeType == 2:
+            if time.time() - start_time >= 20:  # Check if 20 seconds have passed
+                counter = 0  # Reset counter
+                modeType = 1  # Set modeType to 1 after 20 seconds
+                start_time = time.time()  # Reset start time
+                update_time = time.time()  # Reset update time
+
         if matchingIndex is not None:
             if counter == 0:
                 counter = 1
-                modeType = 1
 
             if counter != 0:
                 if counter == 1:  # first frame
@@ -108,15 +119,23 @@ def run_facial_recognition():
                         print(f"Blob img/{id}.jpg does not exist.")
                         workersImg = np.zeros((256, 256, 3), dtype=np.uint8)  # Create a black image as placeholder
 
+                    # Increment attendance or initialize if key doesn't exist
+                    if 'total_attendance' in workersInfo:
+                        workersInfo['total_attendance'] += 1
+                    else:
+                        workersInfo['total_attendance'] = 1
 
                     # Updating data
                     ref = db.reference(f'Workers/{id}')
-                    workersInfo['total_attendence'] += 1
-                    ref.update({'total_attendence': workersInfo['total_attendence']})
-
-                    print(workersInfo)
+                    ref.update({'total_attendance': workersInfo['total_attendance']})
+                if 10<counter<20:
+                    modeType = 2
                     imgBack[44:44 + 633, 808:808 + 414] = imgModelsList[modeType]
-                    cv2.putText(imgBack, str(workersInfo['total_attendence']), (820, 120),
+
+                if counter <= 10:
+                    imgBack[44:44 + 633, 808:808 + 414] = imgModelsList[1]
+
+                    cv2.putText(imgBack, str(workersInfo['total_attendance']), (820, 120),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
                     cv2.putText(imgBack, str(workersInfo['name']), (930, 120),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.75, (231, 122, 29), 2)  # BGR
@@ -135,7 +154,7 @@ def run_facial_recognition():
         # Exit on 'q' key press
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-        elif cv2.getWindowProperty("Face Smart", cv2.WND_PROP_VISIBLE) < 1: # quit window 
+        elif cv2.getWindowProperty("Face Smart", cv2.WND_PROP_VISIBLE) < 1: # quit window
             break
 
     cap.release()
