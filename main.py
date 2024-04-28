@@ -98,16 +98,13 @@ def run_facial_recognition():
                     imgBack[44:44 + 633, 808:808 + 414] = imgModelsList[modeType]
                     cv2.putText(imgBack, str(workersInfo['total_attendence']), (820, 120),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                    #cv2.putText(imgBack, str(workersInfo['name']), (50, 100),
-                                #cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                    #cv2.putText(imgBack, str(id), (50, 150),
-                                #cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                    #cv2.putText(imgBack, str(workersInfo['Job']), (50, 200),
-                                #cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                    #cv2.putText(imgBack, str(workersInfo['Tache']), (50, 250),
-                                #cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                    #cv2.putText(imgBack, str(workersInfo['lastAttendenceDate']), (50, 300),
-                                #cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                    cv2.putText(imgBack, str(workersInfo['name']), (930, 120),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.75, (231, 122,29 ), 2) # BGR
+                    cv2.putText(imgBack, str(id), (960, 495),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.85, (255, 255, 255), 2)
+                    cv2.putText(imgBack, str(workersInfo['Job']), (960, 555),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.85, (255, 255, 255), 2)
+
 
                 counter += 1  # to keep counting
 
