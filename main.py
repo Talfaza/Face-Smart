@@ -96,7 +96,7 @@ def run_facial_recognition():
                     workersInfo = db.reference(f'Workers/{id}').get()
                     print(workersInfo)
                     imgBack[44:44 + 633, 808:808 + 414] = imgModelsList[modeType]
-                    cv2.putText(imgBack, str(workersInfo['total_attendence']), (790, 130),
+                    cv2.putText(imgBack, str(workersInfo['total_attendence']), (820, 120),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
                     #cv2.putText(imgBack, str(workersInfo['name']), (50, 100),
                                 #cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
