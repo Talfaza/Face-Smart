@@ -3,6 +3,19 @@ import os
 import pickle
 import face_recognition
 import numpy as np
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+from firebase_admin import storage
+
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred, {
+    'databaseURL':"https://facesmart1-default-rtdb.europe-west1.firebasedatabase.app/",
+    'storageBucket':"facesmart1.appspot.com"
+
+})
+
+
 
 
 # Webcam size function (reusable)
@@ -35,6 +48,15 @@ def run_facial_recognition():
     encodingListKnownId = pickle.load(file)
     file.close()
     encodingListKnown, workerId = encodingListKnownId
+    modeType = 0
+    id = -1
+
+    # modelType to change the image in the ui
+    # counter to check for the match in frames
+    # Very first frame counter= 1
+
+    counter = 0
+    matchingIndex = None  # Define matchingIndex before the loop
 
     while True:
         success, img = cap.read()
@@ -56,8 +78,8 @@ def run_facial_recognition():
             distanceFace = face_recognition.face_distance(encodingListKnown, encodedFace)
 
             # Print results for debugging (optional)
-            # print("matching", matching)
-            # print("distance", distanceFace)  # the lower the better
+            #print("matching", matching)
+            #print("distance", distanceFace)  # the lower the better
 
             matchingIndex = np.argmin(distanceFace)
 
@@ -68,13 +90,25 @@ def run_facial_recognition():
                 y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4  # 4 because we downscaled the image by 4
                 bbox = 55 + x1, 162 + y1, x2 - x1, y2 - y1
 
-                imgBack = cv2.rectangle(imgBack, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), (0, 255, 0), 2)  # Draw green bounding box
+                imgBack = cv2.rectangle(imgBack, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]),
+                                        (0, 255, 0), 2)  # Draw green bounding box
 
         cv2.imshow("Face Smart", imgBack)
 
         # Exit on 'q' key press
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+        if matchingIndex is not None:  # Check if a face match was found
+            id = workerId[matchingIndex]
+            if counter == 0:
+                counter = 1
+                workersInfo = db.reference(f'Workers/{id}').get()
+                print(workersInfo)
+
+            if counter != 0:
+                if counter == 1:  # first frame
+                    counter += 1  # to keep counting
 
     cap.release()
     window_open = False  # Set flag to indicate window is closed
