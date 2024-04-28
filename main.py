@@ -13,6 +13,7 @@ firebase_admin.initialize_app(cred, {
     'databaseURL': "https://facesmart1-default-rtdb.europe-west1.firebasedatabase.app/",
     'storageBucket': "facesmart1.appspot.com"
 })
+bucket = storage.bucket()
 
 # Webcam size function (reusable)
 def set_webcam_size(cap, width=640, height=480):
@@ -52,6 +53,7 @@ def run_facial_recognition():
 
     counter = 0
     matchingIndex = None  # Define matchingIndex before the loop
+    workersImg = np.zeros((256, 256, 3), dtype=np.uint8)  # Placeholder black image
 
     while True:
         success, img = cap.read()
@@ -65,7 +67,6 @@ def run_facial_recognition():
 
         # Overlay background and models
         imgBack[162:162 + 480, 55:55 + 640] = img
-
 
         # Look through all encodings and compare with pickle encoded files
         for encodedFace, locationFace in zip(currentFrameEncoding, currentFrameFace):
@@ -85,7 +86,6 @@ def run_facial_recognition():
                                         (0, 255, 0), 2)  # Draw green bounding box
 
         if matchingIndex is not None:
-            #id = workerId[matchingIndex]
             if counter == 0:
                 counter = 1
                 modeType = 1
@@ -93,18 +93,40 @@ def run_facial_recognition():
             if counter != 0:
                 if counter == 1:  # first frame
                     id = workerId[matchingIndex]
+                    # Getting data from db
                     workersInfo = db.reference(f'Workers/{id}').get()
+
+                    # Getting images from db
+                    blob = bucket.get_blob(f'img/{id}.jpg')
+                    if blob is not None:
+                        array = np.frombuffer(blob.download_as_string(), np.uint8)
+                        workersImg = cv2.imdecode(array, cv2.IMREAD_COLOR)
+                        if len(workersImg.shape) == 0:
+                            print(f"Empty or corrupted image: img/{id}.jpg")
+                            workersImg = np.zeros((256, 256, 3), dtype=np.uint8)  # Create a black image as placeholder
+                    else:
+                        print(f"Blob img/{id}.jpg does not exist.")
+                        workersImg = np.zeros((256, 256, 3), dtype=np.uint8)  # Create a black image as placeholder
+
+
+                    # Updating data
+                    ref = db.reference(f'Workers/{id}')
+                    workersInfo['total_attendence'] += 1
+                    ref.update({'total_attendence': workersInfo['total_attendence']})
+
                     print(workersInfo)
                     imgBack[44:44 + 633, 808:808 + 414] = imgModelsList[modeType]
                     cv2.putText(imgBack, str(workersInfo['total_attendence']), (820, 120),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
                     cv2.putText(imgBack, str(workersInfo['name']), (930, 120),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.75, (231, 122,29 ), 2) # BGR
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.75, (231, 122, 29), 2)  # BGR
                     cv2.putText(imgBack, str(id), (960, 495),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.85, (255, 255, 255), 2)
                     cv2.putText(imgBack, str(workersInfo['Job']), (960, 555),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.85, (255, 255, 255), 2)
-
+                    # Printing image
+                    if workersImg is not None and len(workersImg.shape) > 0:
+                        imgBack[150:150 + 256, 884:884 + 256] = cv2.resize(workersImg, (256, 256))
 
                 counter += 1  # to keep counting
 
