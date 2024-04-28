@@ -99,18 +99,20 @@ def run_facial_recognition():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-        if matchingIndex is not None:  # Check if a face match was found
-            id = workerId[matchingIndex]
+        if matchingIndex is not None:
+            #id = workerId[matchingIndex]
             if counter == 0:
                 counter = 1
-                workersInfo = db.reference(f'Workers/{id}').get()
-                print(workersInfo)
+
 
             if counter != 0:
                 if counter == 1:  # first frame
+                    id = workerId[matchingIndex]
+                    workersInfo = db.reference(f'Workers/{id}').get()
+                    print(workersInfo)
                     counter += 1  # to keep counting
 
     cap.release()
-    window_open = False  # Set flag to indicate window is closed
+    window_open = False
     cv2.destroyAllWindows()
 
