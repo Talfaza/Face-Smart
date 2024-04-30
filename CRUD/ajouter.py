@@ -6,10 +6,6 @@ from tkinter import filedialog
 import firebase_admin
 from firebase_admin import credentials
 
-cred_workers = credentials.Certificate("serviceAccountKey.json")
-firebase_admin.initialize_app(cred_workers, name='Workers')
-
-
 def Ajouter():
     def resize_image(image_path, size=(250, 250)):
         try:

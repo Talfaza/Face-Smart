@@ -5,10 +5,6 @@ from firebase_admin import credentials
 from firebase_admin import db
 from CRUD import ajouter
 
-# Initialize Firebase app
-cred_workers = credentials.Certificate("serviceAccountKey.json")
-if not firebase_admin._apps:
-    firebase_admin.initialize_app(cred_workers, name='Workers')
 
 def ui():
     app = ct.CTk()

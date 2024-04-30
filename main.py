@@ -6,15 +6,11 @@ import numpy as np
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
+from firebase_utils import initialize_firebase
 from firebase_admin import storage
 import time
 
-cred = credentials.Certificate("serviceAccountKey.json")
-firebase_admin.initialize_app(cred, {
-    'databaseURL': "https://facesmart1-default-rtdb.europe-west1.firebasedatabase.app/",
-    'storageBucket': "facesmart1.appspot.com"
-})
-bucket = storage.bucket()
+
 
 # Webcam size function (reusable)
 def set_webcam_size(cap, width=640, height=480):

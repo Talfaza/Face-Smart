@@ -2,13 +2,15 @@ import customtkinter as ct
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
+from firebase_admin import storage
 
 # Initialize Firebase app
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred, {
     'databaseURL': "https://facesmart1-default-rtdb.europe-west1.firebasedatabase.app/",
+    'storageBucket': "facesmart1.appspot.com"
 })
-
+bucket = storage.bucket()
 # Flag to track login section visibility (initially hidden)
 is_login_visible = False
 
