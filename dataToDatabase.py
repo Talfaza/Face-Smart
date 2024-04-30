@@ -30,3 +30,12 @@ data = {
 
 for key, val in data.items():
     reference.child(key).set(val)
+
+reference = db.reference('Auth')
+data = {
+    'id': 'admin',
+    'password': 'admin'
+}
+
+for key, val in data.items():
+    reference.child(key).set(val)
