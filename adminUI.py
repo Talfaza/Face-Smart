@@ -1,15 +1,17 @@
 import tkinter as tk
 import customtkinter as ct
-from firebase_admin import credentials, db, initialize_app
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
 
 cred = credentials.Certificate("serviceAccountKey.json")
-initialize_app(cred, {
-  'databaseURL': "https://facesmart1-default-rtdb.europe-west1.firebasedatabase.app/",
-})
+cred_workers = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred_workers, name='Workers')
+
 
 def ui():
   app = ct.CTk()
-  app.title("Workers Database Viewer")
+  app.title("Workers Viewer")
   app.geometry("800x600")
 
   # Retrieve data from the 'Workers' database
@@ -54,4 +56,4 @@ def ui():
 
   app.mainloop()
 
-ui()
+
