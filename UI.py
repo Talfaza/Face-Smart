@@ -1,16 +1,47 @@
 import customtkinter as ct
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+
+# Initialize Firebase app
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred, {
+    'databaseURL': "https://facesmart1-default-rtdb.europe-west1.firebasedatabase.app/",
+})
 
 # Flag to track login section visibility (initially hidden)
 is_login_visible = False
 
-# Function to toggle login section visibility
-def toggle_login():
-    global is_login_visible
+
 
 # Function to start facial recognition when the button is clicked
 def start_face_recognition():
-    import main  # Assuming face_recognition.py is in the same directory
+    import main
     main.run_facial_recognition()
+
+
+# Function to handle login
+def login():
+    # Retrieve the ID and password entered by the user
+    user_id = id_entry.get()
+    user_password = password_entry.get()
+
+    # Retrive the data from the database
+    reference = db.reference('Auth')
+    auth_data = reference.get()
+
+    if user_id == auth_data['id'] and user_password == auth_data['password']:
+        id_entry.delete(0, 'end')
+        password_entry.delete(0, 'end')
+        import adminUI
+
+        adminUI.ui()
+
+
+
+    # Clear the input fields after retrieving the data (optional)
+
+
 
 # Create the main window
 app = ct.CTk()
@@ -53,11 +84,11 @@ password_entry = ct.CTkEntry(master=password_frame, show="*", placeholder_text="
 password_entry.pack(side="left", expand=True, padx=10)  # Add left and right padding
 
 # Login button
-login_button = ct.CTkButton(master=login_frame, text="Login!")
+login_button = ct.CTkButton(master=login_frame, text="Login!", command=login)
 login_button.pack(pady=10)  # Add bottom padding
 
 # **Create and add buttons to the top-left corner:**
-loginButtonMenu = ct.CTkButton(master=app, text="Login", command=toggle_login)
+loginButtonMenu = ct.CTkButton(master=app, text="Login")
 loginButtonMenu.place(relx=0.0, rely=0.01, anchor="nw")
 
 faceButtonMenu = ct.CTkButton(master=app, text="Face Smart", command=start_face_recognition)
