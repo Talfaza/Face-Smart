@@ -75,6 +75,3 @@ def ui():
     button3.grid(row=2, column=len(headers) * 2 + 1, padx=(100, 0), pady=(5, 5), sticky="e")
     app.mainloop()
 
-
-# Start the Tkinter event loop
-
