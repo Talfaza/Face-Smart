@@ -3,6 +3,7 @@ from firebase_admin import db
 import ajouter
 import modifier
 import main
+import supprimer
 
 
 def open_ajouter_window():
@@ -12,6 +13,12 @@ def open_ajouter_window():
 def open_modifier_window():
     app.destroy()
     modifier.update_database()
+
+def open_supprimier_windows():
+    app.destroy()
+    supprimer.delete_worker()
+
+
 def ui():
     global app
     app = ct.CTk()
@@ -61,7 +68,7 @@ def ui():
     button1 = ct.CTkButton(master=app, text="Ajouter", command=open_ajouter_window)
     button1.grid(row=0, column=len(headers) * 2 + 1, padx=(100, 0), pady=(5, 5), sticky="e")
 
-    button2 = ct.CTkButton(master=app, text="Supprimer")
+    button2 = ct.CTkButton(master=app, text="Supprimer",command=open_supprimier_windows)
     button2.grid(row=1, column=len(headers) * 2 + 1, padx=(100, 0), pady=(5, 5), sticky="e")
 
     button3 = ct.CTkButton(master=app, text="Modifier",command=open_modifier_window)
