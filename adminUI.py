@@ -1,6 +1,7 @@
 import customtkinter as ct
 from firebase_admin import db
 import ajouter
+import modifier
 import main
 
 
@@ -8,7 +9,9 @@ def open_ajouter_window():
     # Function to open the "Ajouter" window
     app.destroy()
     ajouter.Ajouter()
-
+def open_modifier_window():
+    app.destroy()
+    modifier.update_database()
 def ui():
     global app
     app = ct.CTk()
@@ -61,7 +64,7 @@ def ui():
     button2 = ct.CTkButton(master=app, text="Supprimer")
     button2.grid(row=1, column=len(headers) * 2 + 1, padx=(100, 0), pady=(5, 5), sticky="e")
 
-    button3 = ct.CTkButton(master=app, text="Modifier")
+    button3 = ct.CTkButton(master=app, text="Modifier",command=open_modifier_window)
     button3.grid(row=2, column=len(headers) * 2 + 1, padx=(100, 0), pady=(5, 5), sticky="e")
     app.mainloop()
 
