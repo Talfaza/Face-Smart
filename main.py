@@ -1,157 +1,150 @@
-import cv2
 import os
 import pickle
 import face_recognition
 import numpy as np
+import cv2
+import cvzone
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
-from firebase_utils import initialize_firebase
 from firebase_admin import storage
-import time
+import numpy as np
+from datetime import datetime
 
-
-
-# Webcam size function (reusable)
-def set_webcam_size(cap, width=640, height=480):
-    cap.set(3, width)
-    cap.set(4, height)
-
+bucket = storage.bucket()
 def run_facial_recognition():
-    # Webcam setup
     cap = cv2.VideoCapture(0)
-    set_webcam_size(cap)
+    cap.set(3, 640)
+    cap.set(4, 480)
 
-    # Background image
-    imgBack = cv2.imread('ressources/background.png')
+    imgBackground = cv2.imread('ressources/background.png')
 
-    # Models directory
-    modelsDir = 'ressources/modules'
-    modelsPath = os.listdir(modelsDir)
+    # Importing the mode images into a list
+    folderModePath = 'ressources/modules'
+    modePathList = os.listdir(folderModePath)
+    imgModeList = []
+    for path in modePathList:
+        imgModeList.append(cv2.imread(os.path.join(folderModePath, path)))
+    # print(len(imgModeList))
 
-    # Load model images
-    imgModelsList = []
-    for name in modelsPath:
-        model_path = os.path.join(modelsDir, name)
-        model_img = cv2.imread(model_path)
-        imgModelsList.append(model_img)
-
-    # Load encoded data from pickle file
-    file = open('./encodeFile.p', 'rb')
-    encodingListKnownId = pickle.load(file)
+    # Load the encoding file
+    print("Loading Encode File ...")
+    file = open('encodeFile.p', 'rb')
+    encodeListKnownWithIds = pickle.load(file)
     file.close()
-    encodingListKnown, workerId = encodingListKnownId
+    encodeListKnown, studentIds = encodeListKnownWithIds
+    # print(studentIds)
+    print("Encode File Loaded")
+
     modeType = 0
-    id = -1
-
-    # modelType to change the image in the ui
-    # counter to check for the match in frames
-    # Very first frame counter= 1
-
     counter = 0
-    matchingIndex = None  # Define matchingIndex before the loop
-    workersImg = np.zeros((256, 256, 3), dtype=np.uint8)  # Placeholder black image
-    start_time = time.time()  # Initialize start time
-    update_time = start_time  # Initialize update time
+    id = -1
+    imgStudent = []
 
     while True:
         success, img = cap.read()
 
-        # Downscale the image
-        smallerImage = cv2.resize(img, (0, 0), None, 0.25, 0.25)
-        smallerImage = cv2.cvtColor(smallerImage, cv2.COLOR_BGR2RGB)
+        imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
+        imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
 
-        currentFrameFace = face_recognition.face_locations(smallerImage)
-        currentFrameEncoding = face_recognition.face_encodings(smallerImage, currentFrameFace)
+        faceCurFrame = face_recognition.face_locations(imgS)
+        encodeCurFrame = face_recognition.face_encodings(imgS, faceCurFrame)
 
-        # Overlay background and models
-        imgBack[162:162 + 480, 55:55 + 640] = img
+        imgBackground[162:162 + 480, 55:55 + 640] = img
+        imgBackground[44:44 + 633, 808:808 + 414] = imgModeList[modeType]
 
-        # Look through all encodings and compare with pickle encoded files
-        for encodedFace, locationFace in zip(currentFrameEncoding, currentFrameFace):
-            matching = face_recognition.compare_faces(encodingListKnown, encodedFace)
-            distanceFace = face_recognition.face_distance(encodingListKnown, encodedFace)
+        if faceCurFrame:
+            for encodeFace, faceLoc in zip(encodeCurFrame, faceCurFrame):
+                matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
+                faceDis = face_recognition.face_distance(encodeListKnown, encodeFace)
+                # print("matches", matches)
+                # print("faceDis", faceDis)
 
-            matchingIndex = np.argmin(distanceFace)
+                matchIndex = np.argmin(faceDis)
+                # print("Match Index", matchIndex)
 
-            if matching[matchingIndex]:
-                # Recognized face
-                print(workerId[matchingIndex])
-                y1, x2, y2, x1 = locationFace
-                y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4  # 4 because we downscaled the image by 4
-                bbox = 55 + x1, 162 + y1, x2 - x1, y2 - x1
-
-                imgBack = cv2.rectangle(imgBack, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]),
-                                        (0, 255, 0), 2)  # Draw green bounding box
-
-                modeType = 2  # Set modeType to 2 when face is recognized
-
-        if modeType == 2:
-            if time.time() - start_time >= 20:  # Check if 20 seconds have passed
-                counter = 0  # Reset counter
-                modeType = 1  # Set modeType to 1 after 20 seconds
-                start_time = time.time()  # Reset start time
-                update_time = time.time()  # Reset update time
-
-        if matchingIndex is not None:
-            if counter == 0:
-                counter = 1
+                if matches[matchIndex]:
+                    # print("Known Face Detected")
+                    # print(studentIds[matchIndex])
+                    y1, x2, y2, x1 = faceLoc
+                    y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
+                    bbox = 55 + x1, 162 + y1, x2 - x1, y2 - y1
+                    imgBackground = cvzone.cornerRect(imgBackground, bbox, rt=0)
+                    id = studentIds[matchIndex]
+                    if counter == 0:
+                        cvzone.putTextRect(imgBackground, "Loading", (275, 400))
+                        cv2.imshow("Face Attendance", imgBackground)
+                        cv2.waitKey(1)
+                        counter = 1
+                        modeType = 1
 
             if counter != 0:
-                if counter == 1:  # first frame
-                    id = workerId[matchingIndex]
-                    # Getting data from db
-                    workersInfo = db.reference(f'Workers/{id}').get()
 
-                    # Getting images from db
+                if counter == 1:
+                    # Get the Data
+                    studentInfo = db.reference(f'Workers/{id}').get()
+                    print(studentInfo)
+                    # Get the Image from the storage
                     blob = bucket.get_blob(f'img/{id}.jpg')
-                    if blob is not None:
-                        array = np.frombuffer(blob.download_as_string(), np.uint8)
-                        workersImg = cv2.imdecode(array, cv2.IMREAD_COLOR)
-                        if len(workersImg.shape) == 0:
-                            print(f"Empty or corrupted image: img/{id}.jpg")
-                            workersImg = np.zeros((256, 256, 3), dtype=np.uint8)  # Create a black image as placeholder
+                    if blob is None:
+                        print(f"Error: Image for student with ID {id} not found in storage!")
+                        continue
+                    array = np.frombuffer(blob.download_as_string(), np.uint8)
+                    imgStudent = cv2.imdecode(array, cv2.COLOR_BGRA2BGR)
+                    # Update data of attendance
+                    datetimeObject = datetime.strptime(studentInfo['lastAttendenceDate'],
+                                                       "%Y-%m-%d %H:%M:%S")
+                    secondsElapsed = (datetime.now() - datetimeObject).total_seconds()
+                    print(secondsElapsed)
+                    if secondsElapsed > 30:
+                        ref = db.reference(f'Students/{id}')
+                        studentInfo['total_attendence'] += 1
+                        ref.child('total_attendence').set(studentInfo['total_attendence'])
+                        ref.child('total_attendence').set(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                     else:
-                        print(f"Blob img/{id}.jpg does not exist.")
-                        workersImg = np.zeros((256, 256, 3), dtype=np.uint8)  # Create a black image as placeholder
+                        modeType = 3
+                        counter = 0
+                        imgBackground[44:44 + 633, 808:808 + 414] = imgModeList[modeType]
 
-                    # Increment attendance or initialize if key doesn't exist
-                    if 'total_attendance' in workersInfo:
-                        workersInfo['total_attendance'] += 1
-                    else:
-                        workersInfo['total_attendance'] = 1
+                if modeType != 3:
 
-                    # Updating data
-                    ref = db.reference(f'Workers/{id}')
-                    ref.update({'total_attendance': workersInfo['total_attendance']})
-                if 10<counter<20:
-                    modeType = 2
-                    imgBack[44:44 + 633, 808:808 + 414] = imgModelsList[modeType]
+                    if 10 < counter < 20:
+                        modeType = 2
 
-                if counter <= 10:
-                    imgBack[44:44 + 633, 808:808 + 414] = imgModelsList[1]
+                    imgBackground[44:44 + 633, 808:808 + 414] = imgModeList[modeType]
 
-                    cv2.putText(imgBack, str(workersInfo['total_attendance']), (820, 120),
-                                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                    cv2.putText(imgBack, str(workersInfo['name']), (930, 120),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.75, (231, 122, 29), 2)  # BGR
-                    cv2.putText(imgBack, str(id), (960, 495),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.85, (255, 255, 255), 2)
-                    cv2.putText(imgBack, str(workersInfo['Job']), (960, 555),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.85, (255, 255, 255), 2)
-                    # Printing image
-                    if workersImg is not None and len(workersImg.shape) > 0:
-                        imgBack[150:150 + 256, 884:884 + 256] = cv2.resize(workersImg, (256, 256))
+                    if counter <= 10:
+                        cv2.putText(imgBackground, str(studentInfo['lastAttendenceDate']), (861, 125),
+                                    cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
+                        cv2.putText(imgBackground, str(studentInfo['name']), (1006, 550),
+                                    cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255), 1)
+                        cv2.putText(imgBackground, str(id), (1006, 493),
+                                    cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255), 1)
+                        cv2.putText(imgBackground, str(studentInfo['Job']), (910, 625),
+                                    cv2.FONT_HERSHEY_COMPLEX, 0.6, (100, 100, 100), 1)
+                        cv2.putText(imgBackground, str(studentInfo['Tache']), (1025, 625),
+                                    cv2.FONT_HERSHEY_COMPLEX, 0.6, (100, 100, 100), 1)
+                        cv2.putText(imgBackground, str(studentInfo['Tache']), (1125, 625),
+                                    cv2.FONT_HERSHEY_COMPLEX, 0.6, (100, 100, 100), 1)
 
-                counter += 1  # to keep counting
+                        (w, h), _ = cv2.getTextSize(studentInfo['name'], cv2.FONT_HERSHEY_COMPLEX, 1, 1)
+                        offset = (414 - w) // 2
+                        cv2.putText(imgBackground, str(studentInfo['name']), (808 + offset, 445),
+                                    cv2.FONT_HERSHEY_COMPLEX, 1, (50, 50, 50), 1)
 
-        cv2.imshow("Face Smart", imgBack)
+                        imgBackground[175:175 + 216, 909:909 + 216] = imgStudent
 
-        # Exit on 'q' key press
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-        elif cv2.getWindowProperty("Face Smart", cv2.WND_PROP_VISIBLE) < 1: # quit window
-            break
+                    counter += 1
 
-    cap.release()
-    cv2.destroyAllWindows()
+                    if counter >= 20:
+                        counter = 0
+                        modeType = 0
+                        studentInfo = []
+                        imgStudent = []
+                        imgBackground[44:44 + 633, 808:808 + 414] = imgModeList[modeType]
+        else:
+            modeType = 0
+            counter = 0
+        # cv2.imshow("Webcam", img)
+        cv2.imshow("Face Attendance", imgBackground)
+        cv2.waitKey(1)
