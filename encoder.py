@@ -8,12 +8,6 @@ from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import storage
 
-cred = credentials.Certificate("serviceAccountKey.json")
-firebase_admin.initialize_app(cred, {
-    'databaseURL':"https://facesmart1-default-rtdb.europe-west1.firebasedatabase.app/",
-    'storageBucket':"facesmart1.appspot.com"
-
-})
 
 # Function to resize images to 250x250
 def resize_image(image):
@@ -47,7 +41,7 @@ for id in modelsPath:
 
     fileName = os.path.join(path, id)
     with open(fileName, 'rb') as file:
-        blob = bucket.blob(firebase_folder + '/' + id) 
+        blob = bucket.blob(firebase_folder + '/' + id)
         blob.upload_from_file(file)
 
 print(len(imgModelsList))

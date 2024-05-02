@@ -1,13 +1,18 @@
-import tkinter as tk
 import customtkinter as ct
-import firebase_admin
-from firebase_admin import credentials
 from firebase_admin import db
-from CRUD import ajouter
+import ajouter
+import main
 
+
+def open_ajouter_window():
+    # Function to open the "Ajouter" window
+    app.destroy()
+    ajouter.Ajouter()
 
 def ui():
+    global app
     app = ct.CTk()
+
     app.title("Workers Viewer")
     app.geometry("800x600")
 
@@ -50,8 +55,7 @@ def ui():
         label.grid(row=1, column=0, columnspan=len(headers) * 2, padx=5, pady=5)
 
     # Create three buttons on the right side with padding
-    # TODO: add command
-    button1 = ct.CTkButton(master=app, text="Ajouter", command=ajouter.Ajouter)
+    button1 = ct.CTkButton(master=app, text="Ajouter", command=open_ajouter_window)
     button1.grid(row=0, column=len(headers) * 2 + 1, padx=(100, 0), pady=(5, 5), sticky="e")
 
     button2 = ct.CTkButton(master=app, text="Supprimer")
@@ -59,6 +63,8 @@ def ui():
 
     button3 = ct.CTkButton(master=app, text="Modifier")
     button3.grid(row=2, column=len(headers) * 2 + 1, padx=(100, 0), pady=(5, 5), sticky="e")
-
     app.mainloop()
+
+
+# Start the Tkinter event loop
 

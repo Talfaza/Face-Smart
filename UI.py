@@ -41,9 +41,6 @@ def login():
 
 
 
-    # Clear the input fields after retrieving the data (optional)
-
-
 
 # Create the main window
 app = ct.CTk()

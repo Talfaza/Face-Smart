@@ -2,6 +2,7 @@ import random
 import os
 from PIL import Image
 import customtkinter as ctk
+import tkinter
 from tkinter import filedialog
 import firebase_admin
 from firebase_admin import credentials
@@ -11,22 +12,26 @@ import cv2
 import face_recognition
 import pickle
 from datetime import datetime
-
+import adminUI
+import atexit
+import sys
 new_file_path = ""
 idWorker = ""
+
+
 
 
 def Ajouter():
     # Function to resize images to 250x250
     def resize_image(image):
-        return image.resize((250, 250))
+        return image.resize((216, 216))
 
     # Function to encode faces in images
     def encode_faces(image_path):
         model_img = cv2.imread(image_path)
         # Resize image if necessary
         img = Image.open(image_path)
-        if img.size != (250, 250):
+        if img.size != (216, 216):
             img = resize_image(img)
             img.save(image_path)  # Overwrite the original image with the resized one
 
@@ -43,6 +48,7 @@ def Ajouter():
     bucket = storage.bucket()
 
     def upload_image():
+        print("Upload image button clicked")  # Debugging statement
         # Generate a random 4-digit number for the image name
         random_number = random.randint(1000, 9999)
         global idWorker
@@ -82,10 +88,10 @@ def Ajouter():
             global idWorker
             idWorker = os.path.splitext(new_file_name)[0]
 
-            # Upload the image to Firebase Storage
+            # Upload the image to Firebase Storage with content type "application/octet-stream"
             firebase_folder = 'img'
             blob = bucket.blob(firebase_folder + '/' + new_file_name)
-            blob.upload_from_filename(new_file_path)
+            blob.upload_from_filename(new_file_path, content_type="application/octet-stream")
 
             # Debugging
             print("Image uploaded to Firebase Storage:", blob.public_url)
@@ -116,8 +122,8 @@ def Ajouter():
     button_upload.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
 
     # Function to handle the button click
-
     def on_button_click():
+        print("Submit button clicked")  # Debugging statement
         # Get the values from the entry widgets
         nom = entry_nom.get()
         job = entry_job.get()
@@ -150,9 +156,12 @@ def Ajouter():
 
         # Close the window after processing
         app.destroy()
+        adminUI.ui()
+
     # Create a button to submit the values
     button_submit = ctk.CTkButton(master=app, text="Submit", command=on_button_click)
     button_submit.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
 
     # Start the Tkinter event loop
     app.mainloop()
+
