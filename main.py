@@ -39,7 +39,7 @@ def run_facial_recognition():
     modeType = 0
     counter = 0
     id = -1
-    imgStudent = []
+    imgWorkers = []
 
     while True:
         success, img = cap.read()
@@ -90,7 +90,7 @@ def run_facial_recognition():
                         print(f"Error: Image for student with ID {id} not found in storage!")
                         continue
                     array = np.frombuffer(blob.download_as_string(), np.uint8)
-                    imgStudent = cv2.imdecode(array, cv2.COLOR_BGRA2BGR)
+                    imgWorkers = cv2.imdecode(array, cv2.COLOR_BGRA2BGR)
                     # Update data of attendance
                     datetimeObject = datetime.strptime(wrokersInfo['lastAttendenceDate'],
                                                        "%Y-%m-%d %H:%M:%S")
@@ -132,7 +132,7 @@ def run_facial_recognition():
                         cv2.putText(imgBackground, str(wrokersInfo['name']), (808 + offset, 445),
                                     cv2.FONT_HERSHEY_COMPLEX, 1, (50, 50, 50), 1)
 
-                        imgBackground[175:175 + 216, 909:909 + 216] = imgStudent
+                        imgBackground[175:175 + 216, 909:909 + 216] = imgWorkers
 
                     counter += 1
 
@@ -140,7 +140,7 @@ def run_facial_recognition():
                         counter = 0
                         modeType = 0
                         wrokersInfo = []
-                        imgStudent = []
+                        imgWorkers = []
                         imgBackground[44:44 + 633, 808:808 + 414] = imgModeList[modeType]
         else:
             modeType = 0
