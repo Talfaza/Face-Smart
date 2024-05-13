@@ -19,4 +19,5 @@ you also need to install additional packages
 
 `pip install cmake face-recognition pycrypto`
 
-TODO : continue later
+
+> UI.py is the main file (id: admin, pass: admin)
