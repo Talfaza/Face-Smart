@@ -2,9 +2,7 @@ import customtkinter as ct
 from firebase_admin import db
 import ajouter
 import modifier
-import main
 import supprimer
-
 
 def open_ajouter_window():
     # Function to open the "Ajouter" window

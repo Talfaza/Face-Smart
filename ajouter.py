@@ -13,8 +13,6 @@ import face_recognition
 import pickle
 from datetime import datetime
 import adminUI
-import atexit
-import sys
 new_file_path = ""
 idWorker = ""
 
@@ -72,7 +70,6 @@ def Ajouter():
             # Dump the encoded face to a pickle file
             with open("encodeFile.p", "ab") as pickle_file:
                 pickle.dump({new_file_name: encoding}, pickle_file)
-
             # Debugging
             print("Encoded face saved to pickle file.")
 

@@ -32,8 +32,8 @@ def run_facial_recognition():
     file = open('encodeFile.p', 'rb')
     encodeListKnownWithIds = pickle.load(file)
     file.close()
-    encodeListKnown, studentIds = encodeListKnownWithIds
-    # print(studentIds)
+    encodeListKnown, workersId = encodeListKnownWithIds
+    # print(workersId)
     print("Encode File Loaded")
 
     modeType = 0
@@ -65,12 +65,12 @@ def run_facial_recognition():
 
                 if matches[matchIndex]:
                     # print("Known Face Detected")
-                    # print(studentIds[matchIndex])
+                    # print(workersId[matchIndex])
                     y1, x2, y2, x1 = faceLoc
                     y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
                     bbox = 55 + x1, 162 + y1, x2 - x1, y2 - y1
                     imgBackground = cvzone.cornerRect(imgBackground, bbox, rt=0)
-                    id = studentIds[matchIndex]
+                    id = workersId[matchIndex]
                     if counter == 0:
                         cvzone.putTextRect(imgBackground, "Loading", (275, 400))
                         cv2.imshow("Face Attendance", imgBackground)

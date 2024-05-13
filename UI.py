@@ -44,7 +44,6 @@ def login():
 
 # Create the main window
 app = ct.CTk()
-app.state('zoomed')
 app.geometry("800x600")
 app.title("Face Smart")
 
@@ -98,10 +97,6 @@ window_width = app.winfo_width()
 custom_color = "#1D7AE7"
 separator = ct.CTkFrame(master=app, width=2, height=2000, fg_color=custom_color)
 separator.place(relx=0.2, rely=0.0)
-
-# Create "test" label (initially hidden)
-test_label = ct.CTkLabel(master=login_frame, text="test", font=("Arial", 20))
-test_label.pack_forget()
 
 # Run the main loop
 app.mainloop()

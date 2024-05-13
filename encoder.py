@@ -9,9 +9,8 @@ from firebase_admin import db
 from firebase_admin import storage
 
 
-# Function to resize images to 250x250
 def resize_image(image):
-    return image.resize((250, 250))
+    return image.resize((216, 216))
 
 #importing images
 path = 'img'
@@ -23,8 +22,7 @@ for id in modelsPath:
     model_path = os.path.join(path, id)
     img = Image.open(model_path)
 
-    # Check if image size is 250x250, if not, resize it
-    if img.size != (250, 250):
+    if img.size != (216, 216):
         img = resize_image(img)
         img.save(model_path)
 
