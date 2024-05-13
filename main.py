@@ -82,8 +82,8 @@ def run_facial_recognition():
 
                 if counter == 1:
                     # Get the Data
-                    studentInfo = db.reference(f'Workers/{id}').get()
-                    print(studentInfo)
+                    wrokersInfo = db.reference(f'Workers/{id}').get()
+                    print(wrokersInfo)
                     # Get the Image from the storage
                     blob = bucket.get_blob(f'img/{id}.jpg')
                     if blob is None:
@@ -92,14 +92,14 @@ def run_facial_recognition():
                     array = np.frombuffer(blob.download_as_string(), np.uint8)
                     imgStudent = cv2.imdecode(array, cv2.COLOR_BGRA2BGR)
                     # Update data of attendance
-                    datetimeObject = datetime.strptime(studentInfo['lastAttendenceDate'],
+                    datetimeObject = datetime.strptime(wrokersInfo['lastAttendenceDate'],
                                                        "%Y-%m-%d %H:%M:%S")
                     secondsElapsed = (datetime.now() - datetimeObject).total_seconds()
                     print(secondsElapsed)
                     if secondsElapsed > 30:
-                        ref = db.reference(f'Students/{id}')
-                        studentInfo['total_attendence'] += 1
-                        ref.child('total_attendence').set(studentInfo['total_attendence'])
+                        ref = db.reference(f'Workers/{id}')
+                        wrokersInfo['total_attendence'] += 1
+                        ref.child('total_attendence').set(wrokersInfo['total_attendence'])
                         ref.child('total_attendence').set(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                     else:
                         modeType = 3
@@ -114,22 +114,22 @@ def run_facial_recognition():
                     imgBackground[44:44 + 633, 808:808 + 414] = imgModeList[modeType]
 
                     if counter <= 10:
-                        cv2.putText(imgBackground, str(studentInfo['lastAttendenceDate']), (861, 125),
+                        cv2.putText(imgBackground, str(wrokersInfo['lastAttendenceDate']), (861, 125),
                                     cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 1)
-                        cv2.putText(imgBackground, str(studentInfo['name']), (1006, 550),
+                        cv2.putText(imgBackground, str(wrokersInfo['name']), (1006, 550),
                                     cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255), 1)
                         cv2.putText(imgBackground, str(id), (1006, 493),
                                     cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255), 1)
-                        cv2.putText(imgBackground, str(studentInfo['Job']), (910, 625),
+                        cv2.putText(imgBackground, str(wrokersInfo['Job']), (910, 625),
                                     cv2.FONT_HERSHEY_COMPLEX, 0.6, (100, 100, 100), 1)
-                        cv2.putText(imgBackground, str(studentInfo['Tache']), (1025, 625),
+                        cv2.putText(imgBackground, str(wrokersInfo['Tache']), (1025, 625),
                                     cv2.FONT_HERSHEY_COMPLEX, 0.6, (100, 100, 100), 1)
-                        cv2.putText(imgBackground, str(studentInfo['Tache']), (1125, 625),
+                        cv2.putText(imgBackground, str(wrokersInfo['Tache']), (1125, 625),
                                     cv2.FONT_HERSHEY_COMPLEX, 0.6, (100, 100, 100), 1)
 
-                        (w, h), _ = cv2.getTextSize(studentInfo['name'], cv2.FONT_HERSHEY_COMPLEX, 1, 1)
+                        (w, h), _ = cv2.getTextSize(wrokersInfo['name'], cv2.FONT_HERSHEY_COMPLEX, 1, 1)
                         offset = (414 - w) // 2
-                        cv2.putText(imgBackground, str(studentInfo['name']), (808 + offset, 445),
+                        cv2.putText(imgBackground, str(wrokersInfo['name']), (808 + offset, 445),
                                     cv2.FONT_HERSHEY_COMPLEX, 1, (50, 50, 50), 1)
 
                         imgBackground[175:175 + 216, 909:909 + 216] = imgStudent
@@ -139,7 +139,7 @@ def run_facial_recognition():
                     if counter >= 20:
                         counter = 0
                         modeType = 0
-                        studentInfo = []
+                        wrokersInfo = []
                         imgStudent = []
                         imgBackground[44:44 + 633, 808:808 + 414] = imgModeList[modeType]
         else:
