@@ -98,9 +98,9 @@ def run_facial_recognition():
                     print(secondsElapsed)
                     if secondsElapsed > 30:
                         ref = db.reference(f'Workers/{id}')
-                        wrokersInfo['total_attendence'] += 1
+                        wrokersInfo['total_attendence'] = int(wrokersInfo['total_attendence']) + 1
                         ref.child('total_attendence').set(wrokersInfo['total_attendence'])
-                        ref.child('total_attendence').set(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                        ref.child('lastAttendenceDate').set(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                     else:
                         modeType = 3
                         counter = 0

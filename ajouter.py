@@ -88,7 +88,7 @@ def Ajouter():
             # Upload the image to Firebase Storage with content type "application/octet-stream"
             firebase_folder = 'img'
             blob = bucket.blob(firebase_folder + '/' + new_file_name)
-            blob.upload_from_filename(new_file_path, content_type="application/octet-stream")
+            blob.upload_from_filename(new_file_path, content_type="image/jpeg")
 
             # Debugging
             print("Image uploaded to Firebase Storage:", blob.public_url)
@@ -140,7 +140,7 @@ def Ajouter():
                 'name': nom,
                 'Job': job,
                 'Tache': tache,
-                'total_attendence': 1,
+                'total_attendence': "1",
                 'lastAttendenceDate': current_date
 
             }
